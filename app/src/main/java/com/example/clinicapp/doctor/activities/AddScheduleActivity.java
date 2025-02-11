@@ -1,33 +1,43 @@
 package com.example.clinicapp.doctor.activities;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.CalendarView;
-import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.helper.widget.Grid;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import com.example.clinicapp.DBHelper;
 import com.example.clinicapp.IDefault;
 import com.example.clinicapp.R;
-import com.example.clinicapp.adapters.CalendarAdapter;
+import com.example.clinicapp.adapters.ScheduleAdapter;
+import com.example.clinicapp.models.ScheduleModel;
+import com.google.android.material.button.MaterialButton;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 public class AddScheduleActivity extends AppCompatActivity implements IDefault
 {
 
     private CalendarView calendarView;
+    private DBHelper dbHelper;
+    private String selectedDate;
+    private MaterialButton btn_save;
+    private RecyclerView rv;
+    private List<ScheduleModel> scheduleModelList;
+    private ScheduleAdapter adapter;
 
-    private RecyclerView recyclerView;
-    private TextView tvMonth, tvSelectedDate;
-    private Calendar calendar;
-    private ArrayList<String> daysList;
-    private CalendarAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -35,56 +45,60 @@ public class AddScheduleActivity extends AppCompatActivity implements IDefault
         setContentView(R.layout.activity_add_schedule);
         initValues();
         setListeners();
+        setRV();
+
+        adapter.setListener(model ->
+        {
+            Toast.makeText(this, model.getDate(), Toast.LENGTH_SHORT).show();
+        });
     }
 
     @Override
     public void initValues()
     {
         calendarView = findViewById(R.id.calendar);
+        dbHelper = new DBHelper(this);
+        btn_save = findViewById(R.id.btnConfirm);
+        rv = findViewById(R.id.rv);
+        adapter = new ScheduleAdapter();
+        scheduleModelList = new ArrayList<>();
 
-        tvMonth = findViewById(R.id.tv_month);
-        recyclerView = findViewById(R.id.recyclerView);
-        tvSelectedDate = findViewById(R.id.tv_selected_date);
-        calendar = Calendar.getInstance();
-        daysList = new ArrayList<>();
-
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 7)); // 7 columns for days of the week
-        loadCalendar();
-
-        adapter = new CalendarAdapter(daysList, day -> tvSelectedDate.setText("Selected Date: " + day + " " + new SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(calendar.getTime())));
-
-        recyclerView.setAdapter(adapter);
     }
 
-    private void loadCalendar() {
-        daysList.clear();
-
-        SimpleDateFormat sdf = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
-        tvMonth.setText(sdf.format(calendar.getTime()));
-
-        Calendar monthCalendar = (Calendar) calendar.clone();
-        monthCalendar.set(Calendar.DAY_OF_MONTH, 1);
-        int firstDayOfWeek = monthCalendar.get(Calendar.DAY_OF_WEEK) - 1;
-
-        int daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-
-        for (int i = 0; i < firstDayOfWeek; i++) {
-            daysList.add("");
-        }
-
-        for (int i = 1; i <= daysInMonth; i++) {
-            daysList.add(String.valueOf(i));
-        }
-
-        if (adapter != null) {
-            adapter.notifyDataSetChanged();
-        }
+    private void setRV()
+    {
+        SharedPreferences sharedPreferences = getSharedPreferences("user", MODE_PRIVATE);
+        int id = sharedPreferences.getInt("id", -1);
+        scheduleModelList.addAll(dbHelper.getSchedulesList(id));
+        adapter.setScheduleModelList(scheduleModelList);
+        rv.setAdapter(adapter);
+        rv.setLayoutManager(new LinearLayoutManager(this));
     }
+
 
     @Override
     public void setListeners()
     {
         calendarView.setMinDate(Calendar.getInstance().getTimeInMillis());
+
+        calendarView.setOnDateChangeListener((calendarView, i, i1, i2) -> selectedDate = formatDate(i, i1, i2));
+
+        btn_save.setOnClickListener(save -> saveSchedule());
+    }
+
+    private void saveSchedule()
+    {
+        SharedPreferences sharedPreferences = getSharedPreferences("user", MODE_PRIVATE);
+        int id = sharedPreferences.getInt("id", -1);
+
+        boolean isSuccess = dbHelper.createSchedule(id, selectedDate);
+        if(isSuccess) Toast.makeText(this, "Schedule set", Toast.LENGTH_SHORT).show();
+        else Toast.makeText(this, "Schedule failed", Toast.LENGTH_SHORT).show();
+    }
+
+
+    private String formatDate(int year, int month, int day) {
+        return String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month + 1, day);
     }
 
     @Override

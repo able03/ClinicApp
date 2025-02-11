@@ -13,6 +13,9 @@
         android:theme="@style/Theme.ClinicApp"
         tools:targetApi="31">
         <activity
+            android:name=".patient.activities.BookAppointmentActivity"
+            android:exported="false" />
+        <activity
             android:name=".doctor.activities.AddScheduleActivity"
             android:exported="false" />
         <activity

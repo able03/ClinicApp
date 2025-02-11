@@ -3,23 +3,39 @@ package com.example.clinicapp.patient.activities;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.clinicapp.Credentials;
+import com.example.clinicapp.DBHelper;
 import com.example.clinicapp.IDefault;
 import com.example.clinicapp.R;
 import com.example.clinicapp.activities.LoginActivity;
-import com.google.android.material.button.MaterialButton;
+import com.example.clinicapp.adapters.DoctorAdapter;
+import com.example.clinicapp.models.DoctorModel;
+import com.example.clinicapp.staticmodels.DoctorStaticModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PatientDashboardActivity extends AppCompatActivity implements IDefault
 {
 
-    private MaterialButton btn_logout;
     private Credentials credentials;
+    private Toolbar toolbar;
+    private RecyclerView rv;
+    private List<DoctorModel> doctorModelList;
+    private DoctorAdapter adapter;
+    private DBHelper db;
+    private TextView tv_name;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -27,33 +43,35 @@ public class PatientDashboardActivity extends AppCompatActivity implements IDefa
         setContentView(R.layout.activity_patient_dashboard);
         initValues();
         setListeners();
+        setSupportActionBar(toolbar);
 
-        btn_logout.setVisibility(View.VISIBLE);
-        TextView tv = findViewById(R.id.tv);
-        SharedPreferences sharedPreferences = this.getSharedPreferences("user", MODE_PRIVATE);
-        if(!sharedPreferences.getBoolean("isLoggedIn", false))
-        {
-            btn_logout.setVisibility(View.GONE);
-            tv.setText("Welcome Guest!");
-        }
+        SharedPreferences sharedPreferences = getSharedPreferences("user", MODE_PRIVATE);
+        String name = sharedPreferences.getString("name", null);
+
+        tv_name.setText(name);
     }
 
     @Override
     public void initValues()
     {
-        btn_logout = findViewById(R.id.btnLogout);
         credentials = new Credentials(this);
+        toolbar = findViewById(R.id.toolbar);
+        rv = findViewById(R.id.rv);
+        doctorModelList = new ArrayList<>();
+        adapter = new DoctorAdapter();
+        db = new DBHelper(this);
+        tv_name = findViewById(R.id.tvName);
     }
 
     @Override
     public void setListeners()
     {
-        btn_logout.setOnClickListener(logout -> {
-            credentials.logout();
-            startActivity(new Intent(PatientDashboardActivity.this, LoginActivity.class));
-            finish();
-        });
+        doctorModelList.addAll(db.getDoctorsList());
+        adapter.setDoctorModels(doctorModelList);
+        rv.setAdapter(adapter);
+        rv.setLayoutManager(new LinearLayoutManager(this));
     }
+
 
     @Override
     public void setStr()
@@ -70,5 +88,26 @@ public class PatientDashboardActivity extends AppCompatActivity implements IDefa
     public void setFragment(Fragment fragment)
     {
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.menu_patient_dashboard, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item)
+    {
+        int id = item.getItemId();
+
+        if(id == R.id.menu_logout)
+        {
+            credentials.logout();
+            startActivity(new Intent(PatientDashboardActivity.this, LoginActivity.class));
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

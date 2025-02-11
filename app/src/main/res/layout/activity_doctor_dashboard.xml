@@ -30,13 +30,25 @@
             >
 
             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Welcome!"
+                android:textSize="25sp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="5dp"/>
+
+            <TextView
                 android:id="@+id/tvName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Welcome Dr. Name!"
-                android:textSize="20sp"
+                android:text="Dr. Sample Name"
+                android:textSize="30sp"
+                android:textColor="@color/black"
+                android:textStyle="bold"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="5dp"/>
+
+
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"

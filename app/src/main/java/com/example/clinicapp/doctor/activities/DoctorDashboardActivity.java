@@ -1,6 +1,7 @@
 package com.example.clinicapp.doctor.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,21 +12,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.clinicapp.Credentials;
 import com.example.clinicapp.IDefault;
-import com.example.clinicapp.OnItemClickListener;
 import com.example.clinicapp.R;
 import com.example.clinicapp.activities.LoginActivity;
-import com.example.clinicapp.adapters.CalendarAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Locale;
 
 public class DoctorDashboardActivity extends AppCompatActivity implements IDefault
 {
@@ -34,6 +28,7 @@ public class DoctorDashboardActivity extends AppCompatActivity implements IDefau
     private Toolbar toolbar;
     private FloatingActionButton fab_add_sched;
     private CalendarView calendarView;
+    private TextView tv_name;
 
 
     @Override
@@ -46,6 +41,10 @@ public class DoctorDashboardActivity extends AppCompatActivity implements IDefau
 
         setSupportActionBar(toolbar);
 
+        SharedPreferences sharedPreferences = getSharedPreferences("user", MODE_PRIVATE);
+        String name = sharedPreferences.getString("name", null);
+
+        tv_name.setText(name);
     }
 
     @Override
@@ -57,7 +56,7 @@ public class DoctorDashboardActivity extends AppCompatActivity implements IDefau
         calendarView = findViewById(R.id.calendar);
         calendarView.setMinDate(Calendar.getInstance().getTimeInMillis());
 
-
+        tv_name = findViewById(R.id.tvName);
     }
 
 
