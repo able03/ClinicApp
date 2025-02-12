@@ -60,7 +60,7 @@ public class AddScheduleActivity extends AppCompatActivity implements IDefault
         dbHelper = new DBHelper(this);
         btn_save = findViewById(R.id.btnConfirm);
         rv = findViewById(R.id.rv);
-        adapter = new ScheduleAdapter();
+        adapter = new ScheduleAdapter(true);
         scheduleModelList = new ArrayList<>();
 
     }
@@ -72,7 +72,7 @@ public class AddScheduleActivity extends AppCompatActivity implements IDefault
         scheduleModelList.addAll(dbHelper.getSchedulesList(id));
         adapter.setScheduleModelList(scheduleModelList);
         rv.setAdapter(adapter);
-        rv.setLayoutManager(new LinearLayoutManager(this));
+        rv.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
     }
 
 

@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
 
+import com.example.clinicapp.models.AppointmentModel;
 import com.example.clinicapp.models.DoctorModel;
 import com.example.clinicapp.models.ScheduleModel;
 
@@ -25,7 +26,7 @@ public class DBHelper extends SQLiteOpenHelper
     {
         db.execSQL("CREATE TABLE doctors(doctor_id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, specialization TEXT, username TEXT, password TEXT)");
         db.execSQL("CREATE TABLE patients(patient_id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, username TEXT, password TEXT)");
-        db.execSQL("CREATE TABLE appointments(appointment_id INTEGER PRIMARY KEY AUTOINCREMENT, doctor_id INTEGER, status TEXT, patient_id INTEGER, date TEXT, time TEXT)");
+        db.execSQL("CREATE TABLE appointments(appointment_id INTEGER PRIMARY KEY AUTOINCREMENT, doctor_id INTEGER, status TEXT, patient_id INTEGER, date TEXT, time TEXT, schedule_id INTEGER, purpose TEXT)");
         db.execSQL("CREATE TABLE medical_records(record_id INTEGER PRIMARY KEY AUTOINCREMENT, patient_id INTEGER, date TEXT)");
         db.execSQL("CREATE TABLE schedules(schedule_id INTEGER PRIMARY KEY AUTOINCREMENT, doctor_id INTEGER, date TEXT)");
     }
@@ -185,7 +186,113 @@ public class DBHelper extends SQLiteOpenHelper
     }
 
 
+    public boolean createAppointment(int doctor_id, int patient_id, String status, String date,
+                                      String time, int schedule_id, String purpose)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("doctor_id", doctor_id);
+        values.put("patient_id", patient_id);
+        values.put("status", status);
+        values.put("date", date);
+        values.put("time", time);
+        values.put("schedule_id", schedule_id);
+        values.put("purpose", purpose);
 
+        return db.insert("appointments", null, values) != -1;
+    }
+
+    public ArrayList<String> getBookedTimeSlots(int doctor_id, int schedule_id, String date) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<String> bookedSlots = new ArrayList<>();
+
+        Cursor cursor = db.query("appointments",
+                new String[]{"time"},
+                "doctor_id = ? AND schedule_id = ? AND date = ?",
+                new String[]{String.valueOf(doctor_id), String.valueOf(schedule_id), date},
+                null, null, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                bookedSlots.add(cursor.getString(cursor.getColumnIndexOrThrow("time")));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return bookedSlots;
+    }
+
+    public ArrayList<ScheduleModel> getBookedSchedulesList(int doctor_id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT DISTINCT s.schedule_id, s.doctor_id, s.date " +
+                "FROM schedules s " +
+                "INNER JOIN appointments a ON s.schedule_id = a.schedule_id " +
+                "WHERE s.doctor_id = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(doctor_id)});
+
+        ArrayList<ScheduleModel> tempList = new ArrayList<>();
+        if (cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
+                int sched_id = cursor.getInt(cursor.getColumnIndexOrThrow("schedule_id"));
+                int doc_id = cursor.getInt(cursor.getColumnIndexOrThrow("doctor_id"));
+                String date = cursor.getString(cursor.getColumnIndexOrThrow("date"));
+
+                tempList.add(new ScheduleModel(sched_id, doc_id, date));
+            }
+        }
+        cursor.close();
+        return tempList;
+    }
+
+    public ArrayList<AppointmentModel> getAppointmentsByDoctorAndSchedule(int doctor_id, int schedule_id)
+    {
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<AppointmentModel> appointmentList = new ArrayList<>();
+
+        Cursor cursor = db.query("appointments",
+                null,
+                "doctor_id = ? AND schedule_id = ?",
+                new String[]{String.valueOf(doctor_id), String.valueOf(schedule_id)},
+                null, null, null);
+
+        if (cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
+                int appointment_id = cursor.getInt(cursor.getColumnIndexOrThrow("appointment_id"));
+                int patient_id = cursor.getInt(cursor.getColumnIndexOrThrow("patient_id"));
+                String status = cursor.getString(cursor.getColumnIndexOrThrow("status"));
+                String date = cursor.getString(cursor.getColumnIndexOrThrow("date"));
+                String time = cursor.getString(cursor.getColumnIndexOrThrow("time"));
+                String purpose = cursor.getString(cursor.getColumnIndexOrThrow("purpose"));
+
+                appointmentList.add(new AppointmentModel(appointment_id, doctor_id, status, patient_id, date, time, schedule_id, purpose));
+            }
+        }
+        cursor.close();
+        return appointmentList;
+    }
+
+    public boolean updateAppointmentStatus(int appointment_id, String newStatus) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("status", newStatus);
+
+        int rowsAffected = db.update("appointments", values, "appointment_id = ?", new String[]{String.valueOf(appointment_id)});
+        return rowsAffected > 0;
+    }
+
+    public String getPatientName(int patientId) {
+        String patientName = "Unknown";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT name FROM patients WHERE patient_id = ?", new String[]{String.valueOf(patientId)});
+
+        if (cursor.moveToFirst()) {
+            patientName = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+        }
+
+        cursor.close();
+        return patientName;
+    }
 
 
 

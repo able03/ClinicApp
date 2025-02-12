@@ -124,22 +124,11 @@
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
            app:singleSelection="true"
+           style="@style/Widget.Material3.Chip.Filter"
            android:layout_marginHorizontal="16dp"
            android:id="@+id/cg">
 
-           <com.google.android.material.chip.Chip
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:text="1:00"/>
 
-           <com.google.android.material.chip.Chip
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:text="1:30"/>
-           <com.google.android.material.chip.Chip
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:text="2:00"/>
 
 
        </com.google.android.material.chip.ChipGroup>
@@ -168,6 +157,7 @@
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
            android:text="Book"
+           android:id="@+id/btnSubmit"
            app:cornerRadius="5dp"
            android:layout_marginHorizontal="16dp"
            android:layout_marginTop="20dp"/>

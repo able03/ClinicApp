@@ -1,6 +1,7 @@
 package com.example.clinicapp.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.clinicapp.R;
+import com.example.clinicapp.doctor.activities.DoctorMyAppointmentsActivity;
 import com.example.clinicapp.models.ScheduleModel;
 
 import java.text.ParseException;
@@ -28,11 +30,18 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ViewHo
     private List<ScheduleModel> scheduleModelList;
     private Context context;
     private OnDateClickListener listener;
+    private boolean isClickable;
 
     public interface OnDateClickListener
     {
         void onDateSelected(ScheduleModel model);
     }
+
+    public ScheduleAdapter(boolean isClickable)
+    {
+        this.isClickable = isClickable;
+    }
+
 
 
     public void setScheduleModelList(List<ScheduleModel> scheduleModelList)
@@ -68,7 +77,15 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ViewHo
         holder.tv_day.setText(getDayOfWeek(dateStr));
         holder.tv_month.setText(monthName);
 
-        holder.cv.setOnClickListener(cv -> listener.onDateSelected(scheduleModelList.get(position)));
+       if(isClickable)
+       {
+           holder.cv.setOnClickListener(cv -> listener.onDateSelected(scheduleModelList.get(position)));
+       }
+       else
+       {
+           holder.cv.setOnClickListener(cv ->  context.startActivity(new Intent(context, DoctorMyAppointmentsActivity.class)));
+
+       }
 
     }
 

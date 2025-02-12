@@ -17,6 +17,7 @@ import com.example.clinicapp.Credentials;
 import com.example.clinicapp.IDefault;
 import com.example.clinicapp.R;
 import com.example.clinicapp.activities.LoginActivity;
+import com.example.clinicapp.fragments.DoctorMyScheduleFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.Calendar;
@@ -45,6 +46,8 @@ public class DoctorDashboardActivity extends AppCompatActivity implements IDefau
         String name = sharedPreferences.getString("name", null);
 
         tv_name.setText(name);
+
+        setFragment(new DoctorMyScheduleFragment());
     }
 
     @Override
@@ -53,8 +56,7 @@ public class DoctorDashboardActivity extends AppCompatActivity implements IDefau
         credentials = new Credentials(this);
         toolbar = findViewById(R.id.toolbar);
         fab_add_sched = findViewById(R.id.fabAddSchedule);
-        calendarView = findViewById(R.id.calendar);
-        calendarView.setMinDate(Calendar.getInstance().getTimeInMillis());
+
 
         tv_name = findViewById(R.id.tvName);
     }
@@ -85,7 +87,7 @@ public class DoctorDashboardActivity extends AppCompatActivity implements IDefau
     @Override
     public void setFragment(Fragment fragment)
     {
-
+        getSupportFragmentManager().beginTransaction().replace(R.id.flMySched, fragment).commit();
     }
 
     @Override
