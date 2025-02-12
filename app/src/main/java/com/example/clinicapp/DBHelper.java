@@ -11,14 +11,17 @@ import androidx.annotation.Nullable;
 import com.example.clinicapp.models.AppointmentModel;
 import com.example.clinicapp.models.DoctorModel;
 import com.example.clinicapp.models.ScheduleModel;
+import com.example.clinicapp.notification.NotificationScheduler;
 
 import java.util.ArrayList;
 
 public class DBHelper extends SQLiteOpenHelper
 {
+    private Context context;
     public DBHelper(@Nullable Context context)
     {
         super(context, "clinic.db", null, 1);
+        this.context = context;
     }
 
     @Override
@@ -278,6 +281,21 @@ public class DBHelper extends SQLiteOpenHelper
         values.put("status", newStatus);
 
         int rowsAffected = db.update("appointments", values, "appointment_id = ?", new String[]{String.valueOf(appointment_id)});
+        if (rowsAffected > 0) {
+            String notificationMessage = newStatus.equals("confirmed") ?
+                    "Your appointment has been confirmed!" : "Your appointment has been canceled.";
+
+            Cursor cursor = db.rawQuery("SELECT patient_id FROM appointments WHERE appointment_id = ?", new String[]{String.valueOf(appointment_id)});
+            if (cursor.moveToFirst()) {
+                int patientId = cursor.getInt(cursor.getColumnIndexOrThrow("patient_id"));
+
+                String patientName = getPatientName(patientId);
+
+                NotificationScheduler.scheduleNotification(context, "Appointment Update", patientName + ", " + notificationMessage, 5);
+            }
+            cursor.close();
+        }
+
         return rowsAffected > 0;
     }
 

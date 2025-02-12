@@ -16,6 +16,7 @@ import com.example.clinicapp.DBHelper;
 import com.example.clinicapp.IDefault;
 import com.example.clinicapp.R;
 import com.example.clinicapp.doctor.activities.DoctorDashboardActivity;
+import com.example.clinicapp.notification.NotificationScheduler;
 import com.example.clinicapp.patient.activities.PatientDashboardActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -43,6 +44,7 @@ public class LoginActivity extends AppCompatActivity implements IDefault
         executor.execute(() -> db.embedDoctors());
         checkAutoLogin();
         setListeners();
+
 
     }
 

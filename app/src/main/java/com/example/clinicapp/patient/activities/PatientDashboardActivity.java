@@ -1,11 +1,16 @@
 package com.example.clinicapp.patient.activities;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -36,6 +41,16 @@ public class PatientDashboardActivity extends AppCompatActivity implements IDefa
     private DoctorAdapter adapter;
     private DBHelper db;
     private TextView tv_name;
+
+    private BroadcastReceiver notificationReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String title = intent.getStringExtra("title");
+            String message = intent.getStringExtra("message");
+
+            Toast.makeText(context, title + ": " + message, Toast.LENGTH_LONG).show();
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -49,7 +64,13 @@ public class PatientDashboardActivity extends AppCompatActivity implements IDefa
         String name = sharedPreferences.getString("name", null);
 
         tv_name.setText(name);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            registerReceiver(notificationReceiver, new IntentFilter("com.example.clinicapp.NOTIFICATION"), Context.RECEIVER_NOT_EXPORTED);
+        }
     }
+
 
     @Override
     public void initValues()
@@ -110,4 +131,13 @@ public class PatientDashboardActivity extends AppCompatActivity implements IDefa
         }
         return super.onOptionsItemSelected(item);
     }
+
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(notificationReceiver);
+    }
+
 }
