@@ -23,6 +23,8 @@ public class DoctorAdapter extends RecyclerView.Adapter<DoctorAdapter.ViewHolder
 
     private List<DoctorModel> doctorModels;
     private Context context;
+    private String type;
+
 
     public void setDoctorModels(List<DoctorModel> doctorModels)
     {

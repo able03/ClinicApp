@@ -3,6 +3,7 @@ package com.example.clinicapp.patient.activities;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,8 +35,7 @@ public class BookAppointmentActivity extends AppCompatActivity implements IDefau
     private List<ScheduleModel> scheduleModelList;
     private ScheduleAdapter adapter;
     private RecyclerView rv;
-    private Credentials credentials;
-    private TextView tv_name, tv_spec, tv_date;
+    private TextView tv_name, tv_spec, tv_date, tv_purpose_lbl;
     private MaterialButton btn_submit;
     private ChipGroup cg;
     private String date, time, purpose;
@@ -50,6 +50,20 @@ public class BookAppointmentActivity extends AppCompatActivity implements IDefau
         initValues();
         setData();
         setListeners();
+
+        SharedPreferences  sharedPreferences = this.getSharedPreferences("user", MODE_PRIVATE);
+        boolean isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false);
+
+        et_purpose.setVisibility(View.VISIBLE);
+        btn_submit.setVisibility(View.VISIBLE);
+        tv_purpose_lbl.setVisibility(View.VISIBLE);
+
+        if(!isLoggedIn)
+        {
+            et_purpose.setVisibility(View.GONE);
+            btn_submit.setVisibility(View.GONE);
+            tv_purpose_lbl.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -60,11 +74,11 @@ public class BookAppointmentActivity extends AppCompatActivity implements IDefau
         tv_spec = findViewById(R.id.tvSpec);
         tv_date = findViewById(R.id.tvDate);
         db = new DBHelper(this);
-        credentials = new Credentials(this);
         scheduleModelList = new ArrayList<>();
         adapter = new ScheduleAdapter(true);
         btn_submit = findViewById(R.id.btnSubmit);
         cg = findViewById(R.id.cg);
+        tv_purpose_lbl = findViewById(R.id.tvPurposeLbl);
 
         et_purpose = findViewById(R.id.etPurpose);
 

@@ -70,7 +70,7 @@ public class LoginActivity extends AppCompatActivity implements IDefault
             loginProcess();
         });
 
-        btn_guest.setOnClickListener(guest -> startActivity(new Intent(LoginActivity.this, PatientDashboardActivity.class)));
+        btn_guest.setOnClickListener(guest -> startActivity(new Intent(LoginActivity.this, GuestActivity.class)));
     }
 
     @Override
