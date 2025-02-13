@@ -18,6 +18,8 @@ import com.example.clinicapp.IDefault;
 import com.example.clinicapp.R;
 import com.example.clinicapp.activities.LoginActivity;
 import com.example.clinicapp.fragments.DoctorMyScheduleFragment;
+import com.example.clinicapp.fragments.RecordFragment;
+import com.example.clinicapp.fragments.TransactionFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.Calendar;
@@ -28,7 +30,6 @@ public class DoctorDashboardActivity extends AppCompatActivity implements IDefau
     private Credentials credentials;
     private Toolbar toolbar;
     private FloatingActionButton fab_add_sched;
-    private CalendarView calendarView;
     private TextView tv_name;
 
 
@@ -48,6 +49,9 @@ public class DoctorDashboardActivity extends AppCompatActivity implements IDefau
         tv_name.setText(name);
 
         setFragment(new DoctorMyScheduleFragment());
+
+        getSupportFragmentManager().beginTransaction().replace(R.id.flTransaction, new TransactionFragment()).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.flRecord, new RecordFragment()).commit();
     }
 
     @Override

@@ -196,7 +196,7 @@ public class DBHelper extends SQLiteOpenHelper
         ContentValues values = new ContentValues();
         values.put("doctor_id", doctor_id);
         values.put("patient_id", patient_id);
-        values.put("status", status);
+        values.put("status", "pending");
         values.put("date", date);
         values.put("time", time);
         values.put("schedule_id", schedule_id);
@@ -248,6 +248,33 @@ public class DBHelper extends SQLiteOpenHelper
         return tempList;
     }
 
+    public ArrayList<AppointmentModel> getConfirmedAppointmentsByDoctor(int doctor_id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<AppointmentModel> appointmentList = new ArrayList<>();
+
+        Cursor cursor = db.query("appointments",
+                null,
+                "doctor_id = ? AND status = ?",
+                new String[]{String.valueOf(doctor_id), "confirmed"},
+                null, null, null);
+
+        if (cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
+                int appointment_id = cursor.getInt(cursor.getColumnIndexOrThrow("appointment_id"));
+                int patient_id = cursor.getInt(cursor.getColumnIndexOrThrow("patient_id"));
+                String status = cursor.getString(cursor.getColumnIndexOrThrow("status"));
+                String date = cursor.getString(cursor.getColumnIndexOrThrow("date"));
+                String time = cursor.getString(cursor.getColumnIndexOrThrow("time"));
+                int schedule_id = cursor.getInt(cursor.getColumnIndexOrThrow("schedule_id"));
+                String purpose = cursor.getString(cursor.getColumnIndexOrThrow("purpose"));
+
+                appointmentList.add(new AppointmentModel(appointment_id, doctor_id, status, patient_id, date, time, schedule_id, purpose));
+            }
+        }
+        cursor.close();
+        return appointmentList;
+    }
+
     public ArrayList<AppointmentModel> getAppointmentsByDoctorAndSchedule(int doctor_id, int schedule_id)
     {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -255,8 +282,8 @@ public class DBHelper extends SQLiteOpenHelper
 
         Cursor cursor = db.query("appointments",
                 null,
-                "doctor_id = ? AND schedule_id = ?",
-                new String[]{String.valueOf(doctor_id), String.valueOf(schedule_id)},
+                "doctor_id = ? AND schedule_id = ? AND status = ?",
+                new String[]{String.valueOf(doctor_id), String.valueOf(schedule_id), "pending"},
                 null, null, null);
 
         if (cursor.getCount() > 0) {
@@ -311,6 +338,77 @@ public class DBHelper extends SQLiteOpenHelper
         cursor.close();
         return patientName;
     }
+
+
+
+
+    public ArrayList<AppointmentModel> getAppointmentsByStatus(int doctor_id, String status) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<AppointmentModel> appointmentList = new ArrayList<>();
+
+        Cursor cursor = db.query("appointments",
+                null,
+                "doctor_id = ? AND status = ?",
+                new String[]{String.valueOf(doctor_id), status},
+                null, null, null);
+
+        if (cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
+                int appointment_id = cursor.getInt(cursor.getColumnIndexOrThrow("appointment_id"));
+                int patient_id = cursor.getInt(cursor.getColumnIndexOrThrow("patient_id"));
+                String date = cursor.getString(cursor.getColumnIndexOrThrow("date"));
+                String time = cursor.getString(cursor.getColumnIndexOrThrow("time"));
+                int schedule_id = cursor.getInt(cursor.getColumnIndexOrThrow("schedule_id"));
+                String purpose = cursor.getString(cursor.getColumnIndexOrThrow("purpose"));
+
+                appointmentList.add(new AppointmentModel(appointment_id, doctor_id, status, patient_id, date, time, schedule_id, purpose));
+            }
+        }
+        cursor.close();
+        return appointmentList;
+    }
+
+    public ArrayList<AppointmentModel> getPendingAppointmentsByDoctor(int doctor_id) {
+        return getAppointmentsByStatus(doctor_id, "pending");
+    }
+
+    public ArrayList<AppointmentModel> getConfirmedAppointments(int doctor_id) {
+        return getAppointmentsByStatus(doctor_id, "confirmed");
+    }
+
+    public ArrayList<AppointmentModel> getCancelledAppointments(int doctor_id) {
+        return getAppointmentsByStatus(doctor_id, "cancelled");
+    }
+
+    public ArrayList<AppointmentModel> getAppointementsList(int doc_id)
+    {
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<AppointmentModel> appointmentList = new ArrayList<>();
+
+        Cursor cursor = db.query("appointments",
+                null,
+                "doctor_id = ?",
+                new String[]{String.valueOf(doc_id)},
+                null, null, null);
+
+        if (cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
+                int appointment_id = cursor.getInt(cursor.getColumnIndexOrThrow("appointment_id"));
+                int patient_id = cursor.getInt(cursor.getColumnIndexOrThrow("patient_id"));
+                String date = cursor.getString(cursor.getColumnIndexOrThrow("date"));
+                String time = cursor.getString(cursor.getColumnIndexOrThrow("time"));
+                String status = cursor.getString(cursor.getColumnIndexOrThrow("status"));
+                int doctor_id = cursor.getInt(cursor.getColumnIndexOrThrow("doctor_id"));
+                int schedule_id = cursor.getInt(cursor.getColumnIndexOrThrow("schedule_id"));
+                String purpose = cursor.getString(cursor.getColumnIndexOrThrow("purpose"));
+
+                appointmentList.add(new AppointmentModel(appointment_id, doctor_id, status, patient_id, date, time, schedule_id, purpose));
+            }
+        }
+        cursor.close();
+        return appointmentList;
+    }
+
 
 
 
