@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/menu_trans_history"
-        android:title="Transation History"
-        android:icon="@drawable/ic_manage_history"/>
+
 
     <item
         android:id="@+id/menu_logout"

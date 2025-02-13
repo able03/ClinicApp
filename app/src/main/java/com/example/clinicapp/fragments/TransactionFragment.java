@@ -50,8 +50,7 @@ public class TransactionFragment extends Fragment
         appointmentModelList.addAll(db.getConfirmedAppointments(id));
 
         adapter = new TransactionAdapter();
-        adapter.setTransactionModelList(appointmentModelList);
-
+        adapter.setTransactionModelList(appointmentModelList, getContext());
 
         rv.setAdapter(adapter);
         rv.setLayoutManager(new LinearLayoutManager(getContext()));

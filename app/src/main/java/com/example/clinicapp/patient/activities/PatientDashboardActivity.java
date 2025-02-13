@@ -25,6 +25,8 @@ import com.example.clinicapp.IDefault;
 import com.example.clinicapp.R;
 import com.example.clinicapp.activities.LoginActivity;
 import com.example.clinicapp.adapters.DoctorAdapter;
+import com.example.clinicapp.fragments.PatientRecordFragment;
+import com.example.clinicapp.fragments.RecordFragment;
 import com.example.clinicapp.models.DoctorModel;
 import com.example.clinicapp.staticmodels.DoctorStaticModel;
 
@@ -69,6 +71,8 @@ public class PatientDashboardActivity extends AppCompatActivity implements IDefa
         {
             registerReceiver(notificationReceiver, new IntentFilter("com.example.clinicapp.NOTIFICATION"), Context.RECEIVER_NOT_EXPORTED);
         }
+
+        setFragment(new PatientRecordFragment());
     }
 
 
@@ -108,7 +112,7 @@ public class PatientDashboardActivity extends AppCompatActivity implements IDefa
     @Override
     public void setFragment(Fragment fragment)
     {
-
+        getSupportFragmentManager().beginTransaction().replace(R.id.flRecord, fragment).commit();
     }
 
     @Override

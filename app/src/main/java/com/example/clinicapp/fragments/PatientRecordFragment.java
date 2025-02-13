@@ -24,9 +24,9 @@ import com.google.android.material.chip.ChipGroup;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RecordFragment extends Fragment implements IDefault
-{
 
+public class PatientRecordFragment extends Fragment implements IDefault
+{
     private ChipGroup cg;
     private RecyclerView rv;
     private DBHelper db;
@@ -37,7 +37,7 @@ public class RecordFragment extends Fragment implements IDefault
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
-        return inflater.inflate(R.layout.fragment_record, container, false);
+        return inflater.inflate(R.layout.fragment_patient_record, container, false);
     }
 
     @Override
@@ -46,6 +46,17 @@ public class RecordFragment extends Fragment implements IDefault
         super.onViewCreated(view, savedInstanceState);
         initValues();
         setListeners();
+    }
+
+    private void setRV(ArrayList<AppointmentModel> model)
+    {
+        list.clear();
+        list.addAll(model);
+        adapter.setAppointmentModelList(list, "patient");
+        rv.setAdapter(adapter);
+        rv.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter.notifyDataSetChanged();
+
     }
 
     @Override
@@ -58,37 +69,26 @@ public class RecordFragment extends Fragment implements IDefault
         list = new ArrayList<>();
         adapter = new AppointmentAdapter();
 
-    }
 
-    private void setRV(ArrayList<AppointmentModel> model)
-    {
-        list.clear();
-        list.addAll(model);
-        adapter.setAppointmentModelList(list, "doctor");
-        rv.setAdapter(adapter);
-        rv.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter.notifyDataSetChanged();
 
     }
-
 
     @Override
     public void setListeners()
     {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("user", Context.MODE_PRIVATE);
-        int doctor_id = sharedPreferences.getInt("id", 0);
-        setRV(db.getAppointementsList(doctor_id));
+        int patient_id = sharedPreferences.getInt("id", 0);
+        setRV(db.getAppointementsListPatient(patient_id));
 
         cg.setOnCheckedStateChangeListener((group, checkedIds) -> {
             if (checkedIds.isEmpty()) return;
 
             int selectedId = checkedIds.get(0);
-            if (selectedId == R.id.all) setRV(db.getAppointementsList(doctor_id));
-            else if (selectedId == R.id.confirmed) setRV(db.getConfirmedAppointments(doctor_id));
-            else if (selectedId == R.id.cancelled) setRV(db.getCancelledAppointments(doctor_id));
-            else if (selectedId == R.id.pending) setRV(db.getPendingAppointmentsByDoctor(doctor_id));
+            if (selectedId == R.id.all) setRV(db.getAppointementsListPatient(patient_id));
+            else if (selectedId == R.id.confirmed) setRV(db.getConfirmedAppointmentsPatient(patient_id));
+            else if (selectedId == R.id.cancelled) setRV(db.getCancelledAppointmentsPatient(patient_id));
+            else if (selectedId == R.id.pending) setRV(db.getPendingAppointmentsByDoctorPatient(patient_id));
         });
-
     }
 
     @Override

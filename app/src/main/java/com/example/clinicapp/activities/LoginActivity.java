@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,6 +22,7 @@ import com.example.clinicapp.notification.NotificationScheduler;
 import com.example.clinicapp.patient.activities.PatientDashboardActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
@@ -32,6 +35,7 @@ public class LoginActivity extends AppCompatActivity implements IDefault
     private TextView tv_signup;
     private String uname, pass;
     private TextInputEditText et_uname, et_pass;
+    private TextInputLayout lo_uname, lo_pass;
     private MaterialButton btn_login, btn_guest;
     private Credentials credentials;
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -58,6 +62,9 @@ public class LoginActivity extends AppCompatActivity implements IDefault
         btn_login = findViewById(R.id.btnLogin);
         credentials = new Credentials(this);
         btn_guest = findViewById(R.id.btnGuest);
+
+        lo_uname = findViewById(R.id.loUsername);
+        lo_pass = findViewById(R.id.loPassword);
     }
 
     @Override
@@ -93,54 +100,91 @@ public class LoginActivity extends AppCompatActivity implements IDefault
 
     }
 
-    private void loginProcess()
-    {
-        if(!uname.isEmpty() && !pass.isEmpty())
-        {
-            Cursor cursor = db.getUser("doctor", uname, pass);
+    private void loginProcess() {
+        if (!validateFields()) {
+            return;
+        }
 
-            if(cursor.getCount() > 0)
-            {
-                cursor.moveToFirst();
-                int id = cursor.getInt(cursor.getColumnIndexOrThrow("doctor_id"));
-                String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
-                String spec = cursor.getString(cursor.getColumnIndexOrThrow("specialization"));
-                String uname = cursor.getString(cursor.getColumnIndexOrThrow("username"));
-                String pass = cursor.getString(cursor.getColumnIndexOrThrow("password"));
-                credentials.setCredentials(id, name, spec, uname, pass, true);
-                Intent intent = new Intent(LoginActivity.this, DoctorDashboardActivity.class);
+        Cursor cursor = db.getUser("doctor", uname, pass);
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            int id = cursor.getInt(cursor.getColumnIndexOrThrow("doctor_id"));
+            String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+            String spec = cursor.getString(cursor.getColumnIndexOrThrow("specialization"));
+            String uname = cursor.getString(cursor.getColumnIndexOrThrow("username"));
+            String pass = cursor.getString(cursor.getColumnIndexOrThrow("password"));
+
+            credentials.setCredentials(id, name, spec, uname, pass, true);
+            Intent intent = new Intent(LoginActivity.this, DoctorDashboardActivity.class);
+            startActivity(intent);
+            finish();
+        } else {
+            Cursor patient = db.getUser("patient", uname, pass);
+            if (patient.getCount() > 0) {
+                patient.moveToFirst();
+                int id = patient.getInt(patient.getColumnIndexOrThrow("patient_id"));
+                String name = patient.getString(patient.getColumnIndexOrThrow("name"));
+                String uname = patient.getString(patient.getColumnIndexOrThrow("username"));
+                String pass = patient.getString(patient.getColumnIndexOrThrow("password"));
+
+                credentials.setCredentials(id, name, null, uname, pass, true);
+                Intent intent = new Intent(LoginActivity.this, PatientDashboardActivity.class);
                 startActivity(intent);
+                finish();
+            } else {
+                et_uname.setError("Invalid username or password");
+                et_pass.setError("Invalid username or password");
             }
-            else
-            {
-                Cursor patient = db.getUser("patient", uname, pass);
-                if(patient.getCount() > 0)
-                {
-                    patient.moveToFirst();
-                    int id = patient.getInt(patient.getColumnIndexOrThrow("patient_id"));
-                    String name = patient.getString(patient.getColumnIndexOrThrow("name"));
-                    String uname = patient.getString(patient.getColumnIndexOrThrow("username"));
-                    String pass = patient.getString(patient.getColumnIndexOrThrow("password"));
-                    credentials.setCredentials(id, name, null, uname, pass, true);
-                    Intent intent = new Intent(LoginActivity.this, PatientDashboardActivity.class);
-                    startActivity(intent);
-
-                }
-                else
-                {
-                    Toast.makeText(this, "Invalid credentials", Toast.LENGTH_SHORT).show();
-                }
-
-                patient.close();
-            }
-            cursor.close();
-
+            patient.close();
         }
-        else
-        {
-            Toast.makeText(this, "All fields are required", Toast.LENGTH_SHORT).show();
-        }
+        cursor.close();
     }
+
+    private boolean validateFields() {
+        boolean isValid = true;
+        if (uname.isEmpty()) {
+            lo_uname.setError("Username is required");
+            et_uname.addTextChangedListener(getTextWatcher(lo_uname));
+            isValid = false;
+        }
+
+        if (pass.isEmpty()) {
+            lo_pass.setError("Password is required");
+            et_pass.addTextChangedListener(getTextWatcher(lo_pass));
+            isValid = false;
+        } else if (pass.length() < 6) {
+            lo_pass.setError("Password must be at least 6 characters long");
+            et_pass.addTextChangedListener(getTextWatcher(lo_pass));
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    private TextWatcher getTextWatcher(TextInputLayout layout)
+    {
+        return new TextWatcher()
+        {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2)
+            {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2)
+            {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable)
+            {
+                layout.setErrorEnabled(false);
+            }
+        };
+    }
+
 
     private void checkAutoLogin()
     {

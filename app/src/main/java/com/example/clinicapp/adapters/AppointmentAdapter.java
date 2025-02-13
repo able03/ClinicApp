@@ -23,9 +23,11 @@ public class AppointmentAdapter extends RecyclerView.Adapter<AppointmentAdapter.
 {
     private List<AppointmentModel> appointmentModelList;
     private Context context;
+    private String type;
 
-    public void setAppointmentModelList(List<AppointmentModel> appointmentModelList)
+    public void setAppointmentModelList(List<AppointmentModel> appointmentModelList, String type)
     {
+        this.type = type;
         this.appointmentModelList = appointmentModelList;
     }
 
@@ -45,26 +47,72 @@ public class AppointmentAdapter extends RecyclerView.Adapter<AppointmentAdapter.
 
         DBHelper dbHelper = new DBHelper(context);
 
-        String name = dbHelper.getPatientName(model.getPatient_id());
-        holder.tv_name.setText(name);
         holder.tv_purpose.setText(model.getPurpose());
 
-        holder.tv_spec.setText("Patient");
+        holder.tv_spec.setText(model.getTime());
 
-        String status = model.getStatus();
-        updateUI(holder, status);
 
-        holder.btn_cancel.setOnClickListener(v -> {
-            dbHelper.updateAppointmentStatus(model.getAppointment_id(), "cancelled");
-            model.setStatus("cancelled");
-            updateUI(holder, "cancelled");
-        });
 
-        holder.btn_confirm.setOnClickListener(v -> {
-            dbHelper.updateAppointmentStatus(model.getAppointment_id(), "confirmed");
-            model.setStatus("confirmed");
-            updateUI(holder, "confirmed");
-        });
+
+
+
+
+
+        switch (type)
+        {
+            case "doctor":
+
+                String name = dbHelper.getPatientName(model.getPatient_id());
+                holder.tv_name.setText(name);
+
+                String status = model.getStatus();
+                updateUI(holder, status);
+
+                holder.btn_cancel.setOnClickListener(v -> {
+                    dbHelper.updateAppointmentStatus(model.getAppointment_id(), "cancelled");
+                    model.setStatus("cancelled");
+                    updateUI(holder, "cancelled");
+                });
+
+                holder.btn_confirm.setOnClickListener(v -> {
+                    dbHelper.updateAppointmentStatus(model.getAppointment_id(), "confirmed");
+                    model.setStatus("confirmed");
+                    updateUI(holder, "confirmed");
+                });
+                break;
+
+            case "patient":
+                String name1 = dbHelper.getDoctorName(model.getDoctor_id());
+                holder.tv_name.setText(name1);
+
+                String status1 = model.getStatus();
+
+                switch (status1) {
+                    case "pending":
+                        holder.btn_cancel.setVisibility(View.GONE);
+                        holder.btn_confirm.setVisibility(View.GONE);
+                        holder.tv_status.setVisibility(View.VISIBLE);
+                        holder.tv_status.setText("Pending");
+                        break;
+                    case "confirmed":
+                        holder.btn_cancel.setVisibility(View.GONE);
+                        holder.btn_confirm.setVisibility(View.GONE);
+                        holder.tv_status.setVisibility(View.VISIBLE);
+                        holder.tv_status.setText("Confirmed");
+                        holder.tv_status.setTextColor(context.getResources().getColor(R.color.confirmed));
+                        break;
+                    case "cancelled":
+                        holder.btn_cancel.setVisibility(View.GONE);
+                        holder.btn_confirm.setVisibility(View.GONE);
+                        holder.tv_status.setVisibility(View.VISIBLE);
+                        holder.tv_status.setText("Cancelled");
+                        holder.tv_status.setTextColor(context.getResources().getColor(R.color.cancelled));
+                        break;
+                }
+
+
+                break;
+        }
 
     }
 

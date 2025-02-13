@@ -81,7 +81,7 @@ public class DoctorMyAppointmentsActivity extends AppCompatActivity implements I
         appointmentModelList.clear();
 
         appointmentModelList.addAll(dbHelper.getAppointmentsByDoctorAndSchedule(doc_id, sched_id));
-        appointmentAdapter.setAppointmentModelList(appointmentModelList);
+        appointmentAdapter.setAppointmentModelList(appointmentModelList, "doctor");
         rv_appointements.setAdapter(appointmentAdapter);
         rv_appointements.setLayoutManager(new LinearLayoutManager(this));
     }

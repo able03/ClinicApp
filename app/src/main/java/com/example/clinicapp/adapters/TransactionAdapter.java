@@ -19,17 +19,20 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 {
     private List<AppointmentModel> transactionModelList;
     private Context context;
+    private DBHelper dbHelper;
 
-    public void setTransactionModelList(List<AppointmentModel> transactionModelList)
+    public void setTransactionModelList(List<AppointmentModel> transactionModelList, Context context)
     {
         this.transactionModelList = transactionModelList;
+        this.context = context;
+        dbHelper = new DBHelper(context);
+        notifyDataSetChanged();
     }
 
     @NonNull
     @Override
     public TransactionAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
     {
-        context = parent.getContext();
         View view = LayoutInflater.from(context).inflate(R.layout.rv_transaction_layout, parent, false);
         return new ViewHolder(view);
     }
@@ -39,8 +42,10 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     {
         AppointmentModel model = transactionModelList.get(position);
 
-        DBHelper dbHelper = new DBHelper(context);
-        String name = dbHelper.getPatientName(model.getAppointment_id());
+        String name = dbHelper.getPatientName(model.getPatient_id());
+        if (name == null || name.isEmpty()) {
+            name = "Unknown";
+        }
         holder.tv_name.setText(name);
     }
 
