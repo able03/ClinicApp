@@ -7,49 +7,57 @@
     tools:context=".fragments.PatientRecordFragment"
     android:padding="16dp">
 
-    <com.google.android.material.chip.ChipGroup
+    <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:singleSelection="true"
-        orientation="horizontal"
-        app:singleLine="true"
-        android:id="@+id/cg">
+        android:scrollbars="none"
+        android:id="@+id/hv">
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/all"
-            android:layout_width="wrap_content"
+        <com.google.android.material.chip.ChipGroup
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:checkable="true"
-            android:text="All"/>
+            app:singleSelection="true"
+            orientation="horizontal"
+            app:singleLine="true"
+            android:id="@+id/cg">
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/confirmed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checkable="true"
-            android:text="Confirmed"/>
+            <com.google.android.material.chip.Chip
+                android:id="@+id/all"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                android:text="All"/>
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/cancelled"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checkable="true"
-            android:text="Cancelled"/>
+            <com.google.android.material.chip.Chip
+                android:id="@+id/confirmed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                android:text="Confirmed"/>
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/pending"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checkable="true"
-            android:text="Pending"/>
+            <com.google.android.material.chip.Chip
+                android:id="@+id/cancelled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                android:text="Cancelled"/>
 
-    </com.google.android.material.chip.ChipGroup>
+            <com.google.android.material.chip.Chip
+                android:id="@+id/pending"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                android:text="Pending"/>
+
+        </com.google.android.material.chip.ChipGroup>
+
+    </HorizontalScrollView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/rv"
-        android:layout_below="@id/cg"/>
+        android:layout_below="@id/hv"/>
 
 
 

@@ -132,8 +132,11 @@ public class LoginActivity extends AppCompatActivity implements IDefault
                 startActivity(intent);
                 finish();
             } else {
-                et_uname.setError("Invalid username or password");
-                et_pass.setError("Invalid username or password");
+                lo_uname.setError("Invalid username or password");
+                et_uname.addTextChangedListener(getTextWatcher(lo_uname));
+
+                lo_pass.setError("Invalid username or password");
+                et_pass.addTextChangedListener(getTextWatcher(lo_pass));
             }
             patient.close();
         }
