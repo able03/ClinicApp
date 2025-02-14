@@ -2,6 +2,8 @@ package com.example.clinicapp.doctor.activities;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -33,7 +35,8 @@ public class DoctorMyAppointmentsActivity extends AppCompatActivity implements I
     private List<AppointmentModel> appointmentModelList;
     private AppointmentAdapter appointmentAdapter;
     private ScheduleAdapter adapter;
-    private int doc_id, sched_id;
+    private TextView tv_no_appointment;
+    private int doc_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -44,12 +47,23 @@ public class DoctorMyAppointmentsActivity extends AppCompatActivity implements I
         setStr();
         setRV();
 
-        adapter.setListener(model ->
-        {
 
+
+        adapter.setListener(model -> {
             setAppointments(doc_id, model.getScheduleID());
-
         });
+
+        if(appointmentModelList.isEmpty())
+        {
+            rv_appointements.setVisibility(View.GONE);
+            tv_no_appointment.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            rv_appointements.setVisibility(View.VISIBLE);
+            tv_no_appointment.setVisibility(View.GONE);
+        }
+
     }
 
     private void setRV()
@@ -74,6 +88,8 @@ public class DoctorMyAppointmentsActivity extends AppCompatActivity implements I
         appointmentModelList = new ArrayList<>();
         appointmentAdapter = new AppointmentAdapter();
 
+        tv_no_appointment = findViewById(R.id.tvNoAppointments);
+
     }
 
     private void setAppointments(int doc_id, int sched_id)
@@ -81,9 +97,22 @@ public class DoctorMyAppointmentsActivity extends AppCompatActivity implements I
         appointmentModelList.clear();
 
         appointmentModelList.addAll(dbHelper.getAppointmentsByDoctorAndSchedule(doc_id, sched_id));
+
+        if(appointmentModelList.isEmpty())
+        {
+            rv_appointements.setVisibility(View.GONE);
+            tv_no_appointment.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            rv_appointements.setVisibility(View.VISIBLE);
+            tv_no_appointment.setVisibility(View.GONE);
+        }
+
         appointmentAdapter.setAppointmentModelList(appointmentModelList, "doctor");
         rv_appointements.setAdapter(appointmentAdapter);
         rv_appointements.setLayoutManager(new LinearLayoutManager(this));
+
     }
 
     @Override

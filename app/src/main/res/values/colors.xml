@@ -5,4 +5,10 @@
 
     <color name="confirmed">#00C853</color>
     <color name="cancelled">#DD2C00</color>
+
+    <color name="ivory_white">#FFFFF0</color>
+    <color name="green_primary">#158580</color>
+    <color name="mint">#F1FDF9</color>
+    <color name="dark_mint">#486669</color>
+    <color name="dark_grey">#3B3838</color>
 </resources>

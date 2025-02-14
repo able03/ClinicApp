@@ -2,17 +2,17 @@ package com.example.clinicapp.patient.activities;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.clinicapp.Credentials;
 import com.example.clinicapp.DBHelper;
 import com.example.clinicapp.IDefault;
 import com.example.clinicapp.R;
@@ -41,6 +41,7 @@ public class BookAppointmentActivity extends AppCompatActivity implements IDefau
     private String date, time, purpose;
     private TextInputEditText et_purpose;
 
+    private LinearLayout ll2;
     private int sched_id;
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -80,6 +81,8 @@ public class BookAppointmentActivity extends AppCompatActivity implements IDefau
         cg = findViewById(R.id.cg);
         tv_purpose_lbl = findViewById(R.id.tvPurposeLbl);
 
+        ll2 = findViewById(R.id.ll2);
+
         et_purpose = findViewById(R.id.etPurpose);
 
         int doctor_id = DoctorStaticModel.getDoctor_id();
@@ -89,11 +92,16 @@ public class BookAppointmentActivity extends AppCompatActivity implements IDefau
         rv.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
 
+        ll2.setVisibility(View.GONE);
         adapter.setListener(model -> {
             tv_date.setText(model.getDate());
             sched_id = model.getScheduleID();
             addChipsToGroup();
+
+            ll2.setVisibility(View.VISIBLE);
         });
+
+
 
         addChipsToGroup();
     }
@@ -155,7 +163,10 @@ public class BookAppointmentActivity extends AppCompatActivity implements IDefau
             chip.setText(time);
             chip.setCheckable(true);
             chip.setClickable(true);
-            chip.setTextColor(getResources().getColor(R.color.black));
+            chip.setTextColor(ContextCompat.getColorStateList(this, R.color.custom_text_chip_color));
+            chip.setChipBackgroundColorResource(R.color.custom_chip_color);
+            chip.setChipStrokeColorResource(R.color.custom_chip_outline);
+            chip.setChipStrokeWidth(1);
 
             cg.addView(chip);
         }
@@ -172,7 +183,9 @@ public class BookAppointmentActivity extends AppCompatActivity implements IDefau
     @Override
     public void clearFields()
     {
-
+        tv_date.setText("");
+        et_purpose.setText("");
+        cg.clearCheck();
     }
 
     @Override
@@ -191,9 +204,14 @@ public class BookAppointmentActivity extends AppCompatActivity implements IDefau
         int schedule_id = sched_id;
 
         if(db.createAppointment(doctor_id, patient_id, status, date, time, schedule_id, purpose))
+        {
             Toast.makeText(this, "Booking success", Toast.LENGTH_SHORT).show();
+            clearFields();
+        }
         else
+        {
             Toast.makeText(this, "Booking failed", Toast.LENGTH_SHORT).show();
+        }
 
 
     }

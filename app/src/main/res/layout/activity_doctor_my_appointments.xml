@@ -23,6 +23,19 @@
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="visible"
         android:id="@+id/rvAppointements"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No appointments"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:alpha="0.5"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:id="@+id/tvNoAppointments"
+            android:layout_marginTop="30dp"/>
 
 </LinearLayout>
